@@ -3,20 +3,16 @@ pipeline {
 	
 	environment {
 	
-		dockerRepo = "serverlesstoolchainjava"
+		dockerRepo = "serverlessefstoolchainjava"
 		AWS_ACCOUNT_ID = "962109799108"
 		AWS_REGION = "eu-west-1"
 		DOCKER_CACHE_IMAGE_VERSION = "latest"
-		S3_TESTRESULTS_LOCATION = "s3://serverlesstoolchainjava/tests-results/"
 
 		package_version = readMavenPom().getVersion()
 		applicationName = readMavenPom().getArtifactId()
 		groupID = readMavenPom().getGroupId()
 		dockerRegistry = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 		
-		//kubernetesNode = 'rancher.maddoudou.click'
-		//deploymentConfigurationPathSource = "deploy-k8s" // Location of the K8s deployment configuration on the pipeline instance
-		//deploymentConfigurationPathKubernetes = "/home/ubuntu/k8s-deployments" // Location of the K8s deployment configuration on the K8s instance
     }
 	
     stages {
@@ -53,7 +49,7 @@ pipeline {
 		stage('OWASP - Dependencies check') {
             steps {
                 echo 'Check OWASP dependencies ...'
-				//sh 'mvn dependency-check:check'
+				sh 'mvn dependency-check:check'
             }
         }
 		
@@ -63,34 +59,7 @@ pipeline {
 				sh 'mvn sonar:sonar' // -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml'
             }
         }
-		stage('Publish test results to S3') {
-            steps {
-                echo 'Purge des precedents rapports generes ...'
-				sh 'rm -f ${applicationName}_TestsResults_*'
-				
-				echo 'Recuperation du resultat des tests via l\'API de Sonar ...'
-				sh 'curl \"http://127.0.0.1:9000/api/issues/search?facets=severities&componentKeys=$groupID:$applicationName&pageSize=9\" > ${applicationName}_TestsResults_temp.json'
-				echo 'Recuperation du nombre de lignes de code et de la couverture des tests ...'
-				sh 'curl \"http://127.0.0.1:9000/api/measures/component?componentKey=$groupID:$applicationName&metricKeys=ncloc,line_coverage,new_line_coverage\" > ${applicationName}_TestCoverage.json'
 
-				echo 'Extraction du nombre de lignes de code et test de couverture en variables d\'environnement ...' // Cette commande resuière le package jq : apt-get install jq
-				sh '''
-					export TIMESTAMP=$(date +\"%Y%m%d%I%M%S\")
-					mv ${applicationName}_TestsResults_temp.json ${applicationName}_TestsResults_${TIMESTAMP}.json
-					sed -i "0,/{/ s/{/{timestamp:$TIMESTAMP,/" ${applicationName}_TestsResults_${TIMESTAMP}.json
-					sed -i '0,/timestamp/ s/timestamp/\"timestamp\"/' ${applicationName}_TestsResults_${TIMESTAMP}.json
-					export LINES_OF_CODE=$(jq \".component.measures[0].value\" ${applicationName}_TestCoverage.json | sed -e \'s/\"//g\')
-					sed -i "0,/{/ s/{/{ncloc:$LINES_OF_CODE,/" ${applicationName}_TestsResults_${TIMESTAMP}.json
-					sed -i '0,/ncloc/ s/ncloc/\"ncloc\"/' ${applicationName}_TestsResults_${TIMESTAMP}.json
-					export CODE_COVERAGE=$(jq \".component.measures[1].value\" ${applicationName}_TestCoverage.json | sed -e \'s/\"//g\')
-					sed -i "0,/{/ s/{/{coverage:$CODE_COVERAGE,/" ${applicationName}_TestsResults_${TIMESTAMP}.json
-					sed -i '0,/coverage/ s/coverage/\"coverage\"/' ${applicationName}_TestsResults_${TIMESTAMP}.json
-					echo 'Export des fichiers dans le bucket S3 ...'
-					aws s3 cp ${applicationName}_TestsResults_${TIMESTAMP}.json ${S3_TESTRESULTS_LOCATION}
-					aws s3 cp target/dependency-check-report.html ${S3_TESTRESULTS_LOCATION}
-				'''
-			}
-		}
 /*		
         stage('Contract testing') {
             steps {

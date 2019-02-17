@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: serverless Toolchain pour une application Java - DAN
+Description: serverless Toolchain pour une application Java avec Sonar installe dans EFS pour persistence des donnees - DAN
 
 
 Parameters:
@@ -9,7 +9,7 @@ Parameters:
   ProjectName:
     Description: Nom du projet utilise pour tagger les ressources creees
     Type: String
-    Default: "serverlessToolchainJava"
+    Default: "serverlessEFSToolchainJava"
     
   ECRRepositoryURL:
     Description: URL du repository cree dans ECR hebergeant les images Docker generee durant l'etape de Post-Build de CodeBuild
@@ -19,7 +19,7 @@ Parameters:
   ApplicationImageRepository:
     Description: Nom de l'image Docker generee durant l'etape de Post-Build de CodeBuild
     Type: String
-    Default: "serverlesstoolchainjava"
+    Default: "serverlessefstoolchainjava"
     
   DockerCodebuildImage:
     Description: Image Docker (et version) utilisee par CodeBuild pour builder l'application
@@ -34,7 +34,7 @@ Parameters:
   bucketS3:
     Description: "Bucket contenant les artefacts de l'application pour leur integration et leur deploiement (codes source et imagedefinitions des conteneurs requis)."
     Type: 'String'
-    Default: "serverlesstoolchainjava"
+    Default: "serverlessefstoolchainjava"
     AllowedPattern: '[a-z0-9]+'
     
   EFSDIR:
@@ -65,7 +65,7 @@ Parameters:
   GitHubRepository:
     Description: Nom du projet declare dans GitHub.
     Type: String
-    Default: "serverlessToolchainJava"
+    Default: "serverlessEFSToolchainJava"
     
   GitHubBranch:
     Description: Branch utilisee dans GitHub.
@@ -80,18 +80,21 @@ Parameters:
     
 # Network parameters -------------------------------------------------
   VPCID:
-    Description: ID du VPC a creer
+    Description: ID du VPC a utiliser
     Type: String
+# A changer !
     Default: 'vpc-06d6b5d796206a334'
     
   PrivateSubnetID:
     Description: ID du subnet Prive dans lequel Codebuild instancie son image Docker pour le build et subnet d'acces au moint de montage EFS.
     Type: String
+# A changer !
     Default: 'subnet-0ec04d560325cc884'
     
   PrivateSGID:
     Description: ID du Security Group associe a CodeBuild pour la recuperation des sources Git en HTTPS.
     Type: String
+# A changer !
     Default: 'sg-0284df363191d517c'
 
     

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: serverless Toolchain - DAN
+Description: serverless EFS Toolchain - DAN
 
 
 Parameters:
@@ -8,7 +8,7 @@ Parameters:
   VPCName:
     Description: Nom du VPC a creer
     Type: String
-    Default: 'serverlessToolchain_VPC_CFN'
+    Default: 'serverlessEFSToolchain_VPC_CFN'
     
   VPCCidrBlock:
     Type: String
@@ -28,7 +28,7 @@ Parameters:
   PublicSubnetName:
     Description: Nom du subnet Public sur lequel la NAT Gateway est attachee.
     Type: String
-    Default: 'serverlessToolchain_PublicSubnet_CFN'
+    Default: 'serverlessEFSToolchain_PublicSubnet_CFN'
         
   PublicSubnetCIDR:
     Type: String
@@ -42,7 +42,7 @@ Parameters:
   PrivateSubnetName:
     Description: Nom du subnet Prive dans lequel Codebuild instancie son image Docker pour le build et subnet d'acces au moint de montage EFS.
     Type: String
-    Default: 'serverlessToolchain_PrivateSubnet_CFN'
+    Default: 'serverlessEFSToolchain_PrivateSubnet_CFN'
     
   PrivateSubnetCIDR:
     Type: String
@@ -56,27 +56,27 @@ Parameters:
   PublicRouteTableName:
     Description: Nom de la table de routage associee au subnet public 'CodebuildPublicSubnet'.
     Type: String
-    Default: 'serverlessToolchain_PublicRouteTable_CFN'
+    Default: 'serverlessEFSToolchain_PublicRouteTable_CFN'
     
   PrivateRouteTableName:
     Description: Nom de la table de routage associee au subnet prive 'CodebuildPrivateSubnet'.
     Type: String
-    Default: 'serverlessToolchain_PrivateRouteTable_CFN'
+    Default: 'serverlessEFSToolchain_PrivateRouteTable_CFN'
     
   InternetGatewayName:
     Description: Nom de l'Internet Gateway associee au VPC.
     Type: String
-    Default: 'serverlessToolchain_IGW_CFN'
+    Default: 'serverlessEFSToolchain_IGW_CFN'
 
   NATGatewayName:
     Description: Nom de la NAT Gateway associee au VPC.
     Type: String
-    Default: 'serverlessToolchain_NAT_CFN'
+    Default: 'serverlessEFSToolchain_NAT_CFN'
     
   PrivateSGName:
     Description: Nom du Security Group associe a CodeBuild pour la recuperation des sources Git en HTTPS.
     Type: String
-    Default: 'serverlessToolchain_CodeBuild-SG_CFN'
+    Default: 'serverlessEFSToolchain_CodeBuild-SG_CFN'
 
     
 # CodeBuild parameters -------------------------------------------------
@@ -84,7 +84,7 @@ Parameters:
   ProjectName:
     Description: Nom du projet utilise pour tagger les ressources creees
     Type: String
-    Default: "serverlessToolchainJava"
+    Default: "serverlessEFSToolchainJava"
     
   ECRRepositoryURL:
     Description: URL du repository cree dans ECR hebergeant les images Docker generee durant l'etape de Post-Build de CodeBuild
@@ -94,7 +94,7 @@ Parameters:
   ApplicationImageRepository:
     Description: Nom de l'image Docker generee durant l'etape de Post-Build de CodeBuild
     Type: String
-    Default: "serverlesstoolchainjava"
+    Default: "serverlessefstoolchainjava"
     
   DockerCodebuildImage:
     Description: Image Docker (et version) utilisee par CodeBuild pour builder l'application
@@ -109,7 +109,7 @@ Parameters:
   bucketS3:
     Description: "Bucket contenant les artefacts de l'application pour leur integration et leur deploiement (codes source et imagedefinitions des conteneurs requis)."
     Type: 'String'
-    Default: "serverlesstoolchainjava"
+    Default: "serverlessefstoolchainjava"
     AllowedPattern: '[a-z0-9]+'
     
   EFSDIR:
@@ -140,7 +140,7 @@ Parameters:
   GitHubRepository:
     Description: Nom du projet declare dans GitHub.
     Type: String
-    Default: "serverlessToolchainJava"
+    Default: "serverlessEFSToolchainJava"
     
   GitHubBranch:
     Description: Branch utilisee dans GitHub.
