@@ -29,7 +29,7 @@ Parameters:
   DockerCacheImageVersion:
     Description: Version de l'image Docker utilisee comme base initiale pour la construction de l'image Docker de l'application.
     Type: String
-    Default: "latest"
+    Default: "basis"
     
   bucketS3:
     Description: "Bucket contenant les artefacts de l'application pour leur integration et leur deploiement (codes source et imagedefinitions des conteneurs requis)."
