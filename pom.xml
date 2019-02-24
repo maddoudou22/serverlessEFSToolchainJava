@@ -82,6 +82,9 @@
               <artifactId>dependency-check-maven</artifactId>
               <version>3.3.2</version>
               <configuration>
+			      <!-- Possibilité de choisir le format du rapport généré : ALL, JSON, CSV, HTML, etc. 
+			      <format>JSON</format>
+				  -->
                   <failBuildOnCVSS>8</failBuildOnCVSS>
               </configuration>
               <executions>
