@@ -17,7 +17,8 @@ phases:
       - echo "demarrage de Sonar"
       - /opt/sonar/sonarqube-7.3/bin/linux-x86-64/sonar.sh start
       
-      - docker build -f $dockerfile_basis -t $accountid.dkr.ecr.$region.amazonaws.com/$cache_image_name:$cache_image_version .
+      - docker build -f dockerfile_basis -t coucou/coucou:1.0 .
+      - docker images
       
       
       - echo "Recuperation des metadonnees de l application (version et nom du package)"
