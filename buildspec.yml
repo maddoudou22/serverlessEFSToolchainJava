@@ -56,11 +56,10 @@ phases:
       - docker build --cache-from $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$DOCKER_CACHE_IMAGE_VERSION --build-arg PACKAGE_VERSION=$PACKAGE_VERSION --build-arg APPLICATION_NAME=$APPLICATION_NAME -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$PACKAGE_VERSION .
       - echo "Pushing the Docker image..."
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$PACKAGE_VERSION
-
       
 cache:
   paths:
     - '/root/.m2/**/*'
     
 artifacts:
-    files: imagedefinitions.json
+    files: $APPLICATION_NAME-$PACKAGE_VERSION.jar
