@@ -17,6 +17,9 @@ phases:
       - echo "demarrage de Sonar"
       - /opt/sonar/sonarqube-7.3/bin/linux-x86-64/sonar.sh start
       
+      - docker build -f $dockerfile_basis -t $accountid.dkr.ecr.$region.amazonaws.com/$cache_image_name:$cache_image_version .
+      
+      
       - echo "Recuperation des metadonnees de l application (version et nom du package)"
       - PACKAGE_VERSION=$(grep -m 1 '<version>' pom.xml | awk -F">" '{print $2}' | awk -F"<" '{print $1}')
       - APPLICATION_NAME=$(grep -m 1 '<artifactId>' pom.xml | awk -F">" '{print $2}' | awk -F"<" '{print $1}')
@@ -25,7 +28,7 @@ phases:
       - $(aws ecr get-login --no-include-email --region $AWS_REGION)
       - echo "Si l'image cache n'existe pas dans le repo ECR elle est reconstruire, sinon elle est telechargee"
       - chmod +x build-docker.sh
-      - ./build-docker.sh $IMAGE_REPO_NAME $DOCKER_CACHE_IMAGE_VERSION dockerfile_basis $AWS_REGION $AWS_ACCOUNT_ID
+#      - ./build-docker.sh $IMAGE_REPO_NAME $DOCKER_CACHE_IMAGE_VERSION dockerfile_basis $AWS_REGION $AWS_ACCOUNT_ID
  
   build:
     commands:
@@ -34,13 +37,14 @@ phases:
       - echo "Compilation du code source ..."
       - mvn -T 1C -Dmaven.test.skip=true clean package
       - echo "Demarrage des tests unitaires ..."
-      - mvn -T 1C test
+      #- mvn -T 1C test
       - echo "Demarrage des tests OWASP ..."
       - mvn dependency-check:check
       - echo "Attente du demarrage de Sonar ..."
-      - timeout 60 sh -c 'until ps aux | grep [o]rg.sonar.ce.app.CeServer; do sleep 1; done'
+      # Si l'image est une Alpine : "timeout -t 60 ...". Si l'image est une Ubuntu : "timeout 60 ..."
+      #- timeout -t 60 sh -c 'until ps aux | grep [o]rg.sonar.ce.app.CeServer; do sleep 1; done'
       - echo "Demarrage des tests Sonar ..."
-      - mvn sonar:sonar #-Duser.home=/opt/sonar/sonarqube-7.3/cache/
+      #- mvn sonar:sonar #-Duser.home=/opt/sonar/sonarqube-7.3/cache/
       - cp target/$APPLICATION_NAME-$PACKAGE_VERSION.jar .
       
   post_build:
